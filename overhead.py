@@ -18,8 +18,8 @@ class Overhead: # This class contains all overhead in the game (the map and the 
     ]
     def _workMap(self, _locations) -> list[str]: # A private function similar to the house map function. It returns the workmap with the player at the desired location.
         return [
-            "  Work Place",
-            " ____________ __________",
+            "  Work Place             ",
+            " ____________ __________ ",
             "|  desk      |     Boss |",
         f"|     {_locations[5]}      |      {_locations[6]}   |",
             "|             _         |",
@@ -43,7 +43,7 @@ class Overhead: # This class contains all overhead in the game (the map and the 
 
     def printOverhead(self, location: int) -> None: # An essential function that will create, evaluate and print the overhead on the user screen. Takes in the self parameter (provided by python) and a location parameter, which is used to display the player at a specific location.
         map: list[str] # A scope property initialised a list of strings that will serve as a handler for the map in the overhead.
-        for loc in self._locations: loc = " " # A simple for loop which makes all locations in the _locations property to a string containing a space " " the space represents absence of the player on the map.
+        for i in range(8): self._locations[i] = " " # A simple for loop which makes all locations in the _locations property to a string containing a space " " the space represents absence of the player on the map.
         self._locations[location] = "@" # Sets the desired location to the player character symbolised by the "@" character
         if(location < 4): # an if-else statement that assigns the scope variable map to a suitable map determined by the location
             map = self._houseMap(self._locations)

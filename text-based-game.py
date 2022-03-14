@@ -61,14 +61,26 @@ def end(status: int):
         exit(0)
     else:
         print("ERROR, function end() received an invalid ")
+
+def scene1():
+    return askQuestion("You reach the crime scene, a small well maintained cityside apartment where a young lady of 24 is lying in a pool of blood. Her husband was talking to the police, answering their questions."
+    "\nDo you:", ["Enquire the husband", "Investigate the body", "Look around the room"])
+
+def scene2():
+    return askQuestion("Prompt 2", ["opt 2"])
+
 def game():
-    overhead.addNote("Hello World.")
-    overhead.addNote("Random note.")
-    overhead.addNote("Another random note.")
-    overhead.addSuspect("John Doe")
-    overhead.printOverhead(0)
+    a = scene1()
+    if(a == 1):
+        scene2()
+    
+
 if(__name__ == "__main__"):
+    print("Hello Detective, welcome to New York Police Department's 21st Precinct. Please Enter your name and press Enter/return to proceed: ")
+    playerName = str(input())
+    print(f"Hello {playerName}, we have heard great stories about you, and we require your help to solve a recent case. Let's hed to the crime scene\n...")
     while True:
-        player = Player("inVincible", score, 0)
+        player = Player(playerName, score, 0)
         overhead = Overhead()
         game()
+        break
