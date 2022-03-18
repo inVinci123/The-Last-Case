@@ -2,29 +2,29 @@ class Overhead: # This class contains all overhead in the game (the map and the 
     m_suspects: list # This is a list of suspects where possible suspects can be added as the story progresses. Note that the underscore (_) is implies that this property/method is private and is meant to be used in this class only. Only used as a convention.
     m_notes: list # This list will contain important notes that the player can refer to while playing the game
     m_locations = [" ", " ", " ", " ", " ", " ", " ", " "] # These is a list of possible locations the player wants to be on the map. Limited to 8 locations, 4 in the house and 4 in the workplace.
-    def _houseMap(self, _locations) -> list[str]: # A private function that returns the house map with the player at the desired location. While I used this function as a temporary fix since I was unable to implement it in my intended way, I did decided to leave it since it served the functional purpose.
+    def houseMap(self, locations) -> list[str]: # A private function that returns the house map with the player at the desired location. While I used this function as a temporary fix since I was unable to implement it in my intended way, I did decided to leave it since it served the functional purpose.
         return [
         "        CRIME SCENE              Neighbour's ",
         " ____________ __________        ____________ ",
         "|  husband   |     bin  |      |            |",
-        f"|     {_locations[1]}      |      {_locations[3]}   |      |            |",
+        f"|     {locations[1]}      |      {locations[2]}   |      |            |",
         "|            |          |      |            |",
-        "|      body  |          |      |            |",
-        f"|     {_locations[0]}       _         |      |            |",
-        "|  HALL      |          |      |  neighbour |",
-        f"|            |          |      |  {_locations[2]}         |",
+        "|      body  |          |      |  neighbour |",
+        f"|     {locations[0]}       _         |      |     {locations[3]}      |",
+        "|  HALL      |          |      |            |",
+        "|            |          |      |            |",
         " ‾‾‾‾\ ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾        ‾‾‾‾\‾‾‾‾‾‾‾ ",
         "                                             "
     ]
-    def _workMap(self, _locations) -> list[str]: # A private function similar to the house map function. It returns the workmap with the player at the desired location.
+    def workMap(self, locations) -> list[str]: # A private function similar to the house map function. It returns the workmap with the player at the desired location.
         return [
             "  Work Place             ",
             " ____________ __________ ",
             "|  desk      |     Boss |",
-        f"|     {_locations[5]}      |      {_locations[6]}   |",
+        f"|     {locations[5]}      |      {locations[6]}   |",
             "|             _         |",
-        f"|     worker |     / {_locations[7]}  |",
-        f"|     {_locations[4]}      |‾‾‾‾‾  ‾‾‾|",
+        f"|     worker |     / {locations[7]}  |",
+        f"|     {locations[4]}      |‾‾‾‾‾  ‾‾‾|",
             "| OFFICE     |          |",
         f"|            |STOREROOM |",
             " ‾‾‾‾\ ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾ ",
@@ -35,20 +35,26 @@ class Overhead: # This class contains all overhead in the game (the map and the 
         self.m_suspects = []
         self.m_notes = []
 
-    def addNote(self, note): # A simple "setter" function that adds a note to the _notes property. While it is possible to directly access the _notes property and append the note from outside the class, I went with the convention. 
-        self.m_notes.append(note)
+    def addNote(self, note): # A simple "setter" function that adds a note to the m_notes property if the note doesn't already exist. While it is possible to directly access the _notes property and append the note from outside the class, I went with the convention. 
+        try:
+            self.m_notes.index(note)
+        except ValueError:
+            self.m_notes.append(note)
 
-    def addSuspect(self, suspect): # A "setter" function that adds a suspect to the "_suspects" property. Similar to the addNote function.
-        self.m_suspects.append(suspect)
+    def addSuspect(self, suspect): # A "setter" function that adds a suspect to the m_suspects property. Similar to the addNote function.
+        try:
+            self.m_suspects.index(suspect)
+        except ValueError:
+            self.m_suspects.append(suspect)
 
     def printOverhead(self, location: int = 1) -> None: # An essential function that will create, evaluate and print the overhead on the user screen. Takes in the self parameter (provided by python) and a location parameter, which is used to display the player at a specific location.
         map: list[str] # A scope property initialised a list of strings that will serve as a handler for the map in the overhead.
         for i in range(8): self.m_locations[i] = " " # A simple for loop which makes all locations in the _locations property to a string containing a space " " the space represents absence of the player on the map.
         self.m_locations[location] = "@" # Sets the desired location to the player character symbolised by the "@" character
         if(location < 4): # an if-else statement that assigns the scope variable map to a suitable map determined by the location
-            map = self._houseMap(self.m_locations)
+            map = self.houseMap(self.m_locations)
         else:
-            map = self._workMap(self.m_locations)
+            map = self.workMap(self.m_locations)
         overhead: str = "" # Initialising a string scope variable: This will be whats printed in the end
         notepad: list[str] = ["______________________________", # a list of notepad lines. (Could've initialised this in the class to improve performance)
                               "| NOTEPAD:                   |",
@@ -59,7 +65,7 @@ class Overhead: # This class contains all overhead in the game (the map and the 
         for i in self.m_notes: # a for loop that goes through all the notes and adds them to the notepad lines. It also determines how many spaces are required between each note to make an even notepad.
             spaces = 27 - len(i)
             note = f"| {i}"
-            if(spaces > 0):
+            if(spaces >= 0):
                 for i in range(spaces):
                     note = f"{note} "
                 note = f"{note}|"
