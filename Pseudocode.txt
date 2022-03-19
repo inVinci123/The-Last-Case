@@ -1,0 +1,43 @@
+class Overhead
+    # Declarations
+    variable m_suspects # a list of suspects
+    variable m_notes # a list of notes
+    variable m_locations = [" ", " ", " ", " ", " ", " ", " ", " "] # a list of possible locations where the player could be. If the player isn't present on that location, the location would be a space character (" ")
+    
+    procedure houseMap(locations) 
+        """
+        A private function that returns the house map with the player at the desired location.
+        The numbers are possible locations where the player could be at.
+        """
+        return [
+        "        CRIME SCENE              Neighbour's ",
+        " ____________ __________        ____________ ",
+        "|  husband   |     bin  |      |            |",
+        "|     1      |      2   |      |            |",
+        "|            |          |      |            |",
+        "|      body  |          |      |  neighbour |",
+       f"|     0       _         |      |     3      |",
+        "|  HALL      |          |      |            |",
+        "|            |          |      |            |",
+        " ‾‾‾‾\ ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾        ‾‾‾‾\‾‾‾‾‾‾‾ ",
+        "                                             "
+        ]
+
+    procedure workMap(locations)
+        """
+        A private function that returns the work map with the player at the desired location.
+        The numbers are possible locations where the player could be at.
+        """
+        return [
+            "  Work Place             ",
+            " ____________ __________ ",
+            "|  desk      |     Boss |",
+            "|     5      |      6   |",
+            "|             _         |",
+            "|     worker |     /    |",
+            "|     4      |‾‾‾‾‾  ‾‾‾|",
+            "| OFFICE     |      7   |",
+            "|            |STOREROOM |",
+            " ‾‾‾‾\ ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾ ",
+            "                         "
+        ]
