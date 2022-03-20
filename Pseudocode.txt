@@ -1,10 +1,10 @@
-class Overhead
+class Hud
     # Declarations
     variable m_suspects # a list of suspects
     variable m_notes # a list of notes
     variable m_locations = [" ", " ", " ", " ", " ", " ", " ", " "] # a list of possible locations where the player could be. If the player isn't present on that location, the location would be a space character (" ")
     
-    procedure houseMap(locations) 
+    procedure houseMap
         """
         A private function that returns the house map with the player at the desired location.
         The numbers are possible locations where the player could be at.
@@ -22,8 +22,9 @@ class Overhead
         " ‾‾‾‾\ ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾        ‾‾‾‾\‾‾‾‾‾‾‾ ",
         "                                             "
         ]
+    end procedure
 
-    procedure workMap(locations)
+    procedure workMap
         """
         A private function that returns the work map with the player at the desired location.
         The numbers are possible locations where the player could be at.
@@ -41,3 +42,527 @@ class Overhead
             " ‾‾‾‾\ ‾‾‾‾‾‾ ‾‾‾‾‾‾‾‾‾‾ ",
             "                         "
         ]
+    end procedure
+        
+    procedure new # A class constructor that intitialises the suspects ansd notes to an empty list
+        set m_suspects to []
+        set m_notes to []
+    end procedure
+
+    procedure AddNote(note) # A function that adds a note to the notepad if that note doesn't already exist
+        if m_notes doesn't have note then
+            add note to m_notes
+    end procedure
+        
+    procedure AddSuspect(suspect) # A function that adds a suspect to the notepad if the suspect doens't already exist
+        if m_suspects doesn't have suspect then
+            add suspect to m_suspects
+    end procedure
+    
+    procedure PrintHud(location)
+        map := []
+        for i := 1 to 8 do
+            set ith element of m_locations to " "
+        if location is less than 4 then
+            set map to HouseMap(m_locations)
+        else do
+            set map to WorkMap(m_locations)
+        hud := ""
+        notepad := ["______________________________", # a list of notepad lines. (Could've initialised this in the class to improve performance)
+                    "| NOTEPAD:                   |",
+                    "|                            |",
+                    "| Notes:                     |"
+                    ]
+        for each note in m_notes do 
+            spaces := 27 - (length of note)
+            line := "| " + note
+            if spaces is greater than or equal to 0 then
+                for i := 1 to spaces do
+                    set line to line + " "
+                set line to line + "|"
+            add line notepad
+        
+        add "|                            |" to notepad
+        add "| Suspects:                  |" to notepad
+
+        for each suspect in m_suspects do
+            spaces := 27 - (length of suspect)
+            line := "| " + suspect
+            for i := 1 to spaces do
+                set line to line + " "
+            set line to line + "|"
+            add line to notepad
+        
+        add "‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾" to notepad
+
+        spaces := "               "
+        for i := 1 to (greater of length of notepad and length of map)
+            if length of notepad is greater than i and length of map is greater than i then do
+                set hud to hud + ith element of map + spaces + ith element of notepad
+            else if length of notepad is greater than i then do
+                set hud to hud + last element of map + spaces + ith element of notepad
+            else do
+                set hud to hud + ith element of map
+            
+        print hud
+        
+score := 25
+playername:= ""
+hud:= new Hud
+birthdate:= ""
+knowsAboutWork:= False
+safeUnlocked:= False
+beenToScene8:= False
+
+procedure askQuestion(prompt, options, counter)
+    print prompt
+    subtract 1 from score
+    if score is less than zero then do
+        end(2)
+    end if
+    for i := 1 to (length of options) do
+        print [i]: ith element of options
+    end for
+    answer := 0
+    loop while answer is less than or equal to 0
+        print "Please Enter a number: "
+        set answer to input
+        if answer is invalid then
+            subtract 1 from counter
+            set answer to 0
+            if counter is less than or equal to zero then
+                print "Too many invalid tries"
+                end program
+            end if
+        end if
+    end loop
+    return answer
+end procedure
+
+procedure end(status)
+    if status is 0 then do
+        print "Congrats, you won!"
+        print "Terry was the murderer. His motive was that Ms Jackson held a lot of evidence against him when she was investigating his corrupt cases.\n"
+        "Yesterday at around 4.15 pm, he wore gloves, snuck into the old lady's apartment, which was left open by the drunk lady, and stole her knife. He then climbed through the vent that connected the two houses.\n"
+        "Then he waited for her to enter her home, slit her throat before she could scream, and then stabbed her back to prevent her from moving.\n"
+        "He then gently lay her down so she wouldn't make a sound when she fell down. He then went back through the vents, exit the house, and disposed the gloves and the murder weapon."
+        print "Your final score was " + score
+        exit program
+    else if status is 1 then do        
+        print "You arrested the wrond person! Better luck next time!"
+        print "Your final score was 0"
+        exit program
+    else if status is 2 then do
+        print "You took too long, the murderer escaped!"
+        print "Your final score was 0"
+        exit program
+end procedure
+
+procedure scene1
+    validResponse := False
+    print("You reach the crime scene, a small well maintained cityside apartment where a young lady of 24 is lying in a pool of blood. Her husband was talking to the police, answering their questions.")
+    loop while validResponse is False
+        PrintHud(location=0)
+        if knowsAboutWork is True then do
+            askQuestion("Do you:", ["Enquire the husband", "Look around the room", "Investigate the body", "Go to the work place"])
+            read answer
+            if answer is Enquire the husband then
+                execute scene2
+            else if answer is Look around the room then
+                execute scene3
+            else if answer is Investigate the Body then
+                execute scene4
+            else if answer is Go to the work place then
+                execute scene6
+        else do
+            askQuestion("Do you:", ["Enquire the husband", "Look around the room", "Investigate the body"])
+            read answer
+            if answer is Enquire the husband then
+                execute scene2
+            else if answer is Look around the room then
+                execute scene3
+            else if answer is Investigate the Body then
+                execute scene4
+        end if
+    end loop
+end procedure
+
+procedure scene2
+    print "playerName Hello sir, I am detective playerName, the lead investigator on this case. Could you please describe everything that happened? Leave no detail out."
+    
+    print "\nHusband: Thank you for investigating sir. So I was out on a week long trip from the 27th till yesterday.\n"
+    "The last I talked to my wife was at 4 pm, when I asked her whether she wanted me to take away some food. She said \"No, I got something special planned for you.\" When I reached home at 6, I rang the doorbell, but no-one answered.\n"
+    print "I grabbed the spare keys from underneath the decor and opened the door to see this scene. I immediately called the police."
+    print "\nOther police officer: We have enquired other neighbours. Since they live in the heart of the city, no one is usually home before 6pm on a working day. Thus, no one around apart from an old lady next door was at home in this building at the time of this incident.\n"
+    print "You write down notes in your notebook.\n"
+    AddNote "Husband was out."
+    print "playerName: Who else has access to your apartment? Anyone that may have the motive to kill your wife?"
+    print "\nHusband: Well, the old lady next door is always complaining about how loud our TV is in the evenings. Don't let her age fool you, detective.\n"
+    "Despite being a 62 year old woman she smokes and gets wasted all the time." 
+    " My wife also worked as a lawyer, so a lot of bad guys she put away may have the motive."
+    AddNote "Worked as a lawyer."
+    set knowsAboutWork to True
+    validResponse:= False
+    loop while validResponse is False
+        PrintHud(1)
+        askQuestion("Do you ", ["Look around the room", "Investigate the body", "Investigate the neighbour", "Go to her workplace", "Arrest the Husband"])
+        read answer
+        if answer is "Look around the room" then do
+            execute scene3
+            set validResponse to True
+        else if answer is Investigate the Body then do
+            execute scene4
+            set validResponse to True
+        else if answer is Investigate the neighbour then do
+            execute scene5 
+            set validResponse to True
+        else if answer is Go to her workplace then do
+            execute scene6
+            set validResponse to True
+        else if answer is arrest the husband then do
+            askQuestion("Are you sure you want to arrest the husband?", ["Yes", "No"])
+            read answer
+            if answer is Yes then do
+                end(1)
+            end if
+        end if
+    end loop
+end procedure
+
+procedure scene3
+    print "You proceed to have a look around the house. Nothing is out of the ordinary."
+    print "You head over to the second room which appears to be normal too. You look inside the bin. There was a packet of pills with a purchase receipt of yesterday."
+    print "You also find a document that was mostly illegible since there was yogurt spilt all over it. However, you could make out the words: \n"
+    ""Thank you for purchasing LIVELONG life insurance, Mr and Mrs Jackson." and the date, which was only 3 days ago.\n"
+    print "playerName: Oh, so the couple purchased a life insurance policy 3 days ago. The husband said he was outside for the past week, but perhaps he was plotting her murder.\n"
+    print "You write notes in you notepad."
+    AddNote "Victim had life insurance"
+    print "You add husband as a suspect"
+    AddSuspect "Husband"
+    PrintHud(2)
+    if knowsAboutWork is True then do
+        askQuestion("Do you: ", ["Enquire the husband", "Investigate the neighbour", "Investigate the body", "Go to her workplace"])
+        read answer
+        if answer is Enquire the husband then do
+            execute scene2
+        else if answer is Investigate the neighbour then do
+            execute scene5
+        else if answer is Investigate the body then do
+            execute scene4
+        else if answer is Go to her workplace then do
+            execute scene6
+        end if
+    else do
+        askQuestion("Do you: ", ["Enquire the husband", "Investigate the neighbour", "Investigate the body"])
+        read answer
+        if answer is Enquire the husband then do
+            execute scene2
+        else if answer is Investigate the neighbour then do
+            execute scene5
+        else if answer is Investigate the body then do
+            execute scene4
+        end if
+    end if
+end procedure
+
+procedure scene4
+    print "You look at the body closely and find that she had been stabbed around the waist, and her throat had been slit.\n"
+    print "Other police officer: The forensic report states that the time of death was around 4:30 pm. Her throat was most likely slit first to ensure she wouldn't be able to scream.\n"
+    "She was next stabbed around her lower spine to make her unable to move. She was then slowly layed down by the murderer to not make a sound. She must have died within 5 minutes of the stabbing.\n"\
+    "There are no CCTVs in the building, and their apartment was on the tenth floor, so the murderer should've used the door to make his entrance and exit. There are no fingerprints around, and the murder weapon isn't found"
+    print "You take down notes\n"
+    AddNote "Time of death: 4:30 pm."
+    AddNote "No fingerprints."
+    AddNote "No murder weapon found."
+    PrintHud(1)
+    if knowsAboutWork is True then do
+        askQuestion("Do you: ", ["Enquire the husband", "Investigate the neighbour", "Look around the room", "Go to her workplace"])
+        read answer
+        if answer is Enquire the husband then do
+            execute scene2
+        else if answer is Investigate the neighbour then do
+            execute scene5
+        else if answer is Look around the room then do
+            execute scene3
+        else if answer is Go to her workplace then do
+            execute scene6
+        end if
+    else do
+        askQuestion("Do you: ", ["Enquire the husband", "Investigate the neighbour", "Look around the room"])
+        read answer
+        if answer is Enquire the husband then do
+            execute scene2
+        else if answer is Investigate the neighbour then do
+            execute scene5
+        else if answer is Look around the room then do
+            execute scene3
+        end if
+    end if
+end procedure
+
+procedure scene5
+    print "You head over to the next door. You find the door open. You enter to find an old lady nearly wasted on her couch. She notices you and attempts to stand up."
+    print You gesture her to stay sitting. You signal the other police officer to search her apartment. He leaves to do so.\n"
+    print "playerName: Evening lady! So you must have heard of the murder next door. Could you tell us anything you know about it?\n"
+    print "Old lady: Yes I heard that annoying kid next door died. Pretty brutal to be honest. They blast their speakers every night.\n"
+    "I always complain and wonder why am I the only one who can hear their TV so loud. Turns out there is a vent connects our living rooms.\n"
+    print "playerName: So where were you yesterday afternoon at 4 pm.\n"
+    print "Old lady: I ran outta booz, so I went to the store a few blocks away to get more. I might have accidentally left the door open.\n"
+    "She walks to a drawer, opens it to reveal a mess of papers. After a minute of searching. she hands over a crumpled receipt stating the purchase of some liquor at 4.35 pm."
+    print "Old lady: Here is the receipt."
+    print "The officer returns saying he couldn't find the murder weapon, however he found a knife holder for two knives with a missing knife. The knife matched the description of the murder weapon.\n"
+    print "You take down notes.\n"
+    AddNote "Old lady was out at 4:30"
+    AddNote "Missing knife at neighbour."
+    AddNote "Vent connects the 2 houses."
+    print "You add Old Lady as a suspect.\n"
+    AddSuspect "Old Lady"
+    validResponse:= False
+    loop while validResponse equals False
+        PrintHud(3)
+        askQuestion("Do you ", ["Look around the room", "Investigate the body", "Enquire the husband", "Go to her workplace", "Arrest the Old Lady"])
+        read answer
+        if answer is Look around the room then do
+            execute scene3
+            set validResponse to False
+        else if answer is Investigate the body then do
+            execute scene4
+            set validResponse to False
+        else if answer is Enquire the husband then do
+            execute scene2
+            set validResponse to False
+        else if answer is Go to her workplace then do
+            execute scene6
+            set validResponse to False
+        else if answer is Arrest the Old lady then do
+            askQuestion("Are you sure you want to arrest the old lady?", ["Yes", "No"])\
+            read answer
+            if answer is Yes then do
+                end(1)
+            end if
+        end if
+    end loop
+end procedure
+
+procedure scene6
+    print "You reach a busy law firm where the victim used to work. You decide to explore the place.\n"
+    PrintHud(4)
+    askQuestion("Do you: ", ["Visit the Victim's desk", "Enquire her co-worker", "Enquire her boss", "Look around the workplace", "Return to the crime scene"])
+    read answer
+    if answer is Visit the Victim's desk then do
+        execute scene7
+    if answer is Enquire her co-worker then do
+        execute scene8
+    if answer is Enquire her Boss then do
+        execute scene9
+    if answer is Look around the workplace then do
+        execute scene10
+    if answer is return to the crime scene then do
+        execute scene 1
+    end if
+end procedure
+
+procedure scene7
+    print "You walk to the victims desk. You notice that it had been cleaned up. You check out the first 3 drawers. All of them contained nothing. You open the last drawer"
+    print "It is empty"
+
+    if safeUnlocked is False then do
+        print "You notice that the fourth drawer was half the length of the others. You lift the false end to reveal a mini safe. It required a 4 digit PIN. Next to the safe is a note."
+        print "It reads "My special day""
+        pin := ""
+        temp := 0
+        for each digit in birthdate
+            if digit is equal to '/' then do
+                add one to temp
+                if temp is equal to 2 then do
+                    break the loop
+                else do
+                    continue to the next iteration
+                end if
+            end if
+            add digit to pin
+        end for
+        PrintHud(5)
+        execute EnterPIN with pin
+    end if
+
+    if safeUnlocked is True then do
+        print "You open the secret safe. It reveals some irrelevant private documents. It also reveals a something of interest..."
+        print "You read an anonymous letter addressed to the victim."
+        print "\n\"Delete all the evidence you gathered about my corrupt cases before I delete you.\""
+        print "\nYou have a close look at the letter on the scribbled handwriting.\n"
+        "You recognise a familiar fragrance. The ink on the letter had the scent of a special edition PYLOT pen, one the you used to possess\n"
+        print "You take notes\n"
+        AddNote "Death threats to victim"
+        AddNote "about internal corruption"
+        if beenToScene8 is True then do
+            print "You add Terry (Co-worker) as a suspect"
+            AddSuspect "Terry (Co-worker)"
+        end if
+
+    PrintHud(5)
+    askQuestion("Do you: ", ["Visit the Victim's desk again", "Enquire her coworker", "Enquire her boss", "Look around the workplace", "Return to the crime scene"])
+    read answer
+    if answer is Visit the Victim's Desk again then do
+        execute scene7
+    else if answer is Enquire her coworker then do
+        execute scene8
+    else if answer is Enquire her boss then do
+        execute scene9
+    else if answer is Look around the workplace then do
+        execute scene10
+    else if answer is Return to the crime scene then do
+        execute scene1
+    end if
+end procedure
+
+procedure EnterPIN(PIN, counter)
+    loop while counter is greater than 0
+        print "Enter PIN: "
+        read answer
+        if answer is equal to PIN then do
+            set safeUnlocked to True
+            return
+        else do
+            subtract one from counter
+            print "The PIN is wrong. You have counter tries/try remaining."
+        end if
+    end loop
+    print "You run out of tries and fail to open the safe again. TIP: the safe pin is the victim's birthday and month. However do not include the leading zeroes."
+end procedure
+
+procedure scene8
+    set beenToScene8 to True
+    print "You walk to her co worker, Terry's desk."
+    print f"{playerName}: Hello sir, you must know about the murder of your co-worker."
+    print "Co-worker: Yes I do. It was extremely unfortunate. Could you give me a second, I need to sign a document.\n"
+    print "Terry signs a lengthy document with his special edition pylot pen.\n"
+    print "Terry: Yes officer, so you were saying... "
+    print f"{playerName}: I'd like to ask you some questions. Where were you at 4 pm yesterday?"
+    print "Terry: If I remember correctly, I was picking up my children from their school."
+    print f"{playerName}: I see. What was your relationship with Ms Jackson like?"
+    print "Terry: Well we were just co-workers. She often asked me for help on her cases since I am a senior to her."
+    print f"{playerName}: Thank you for your time. We shall reach back to you if we need to."
+    if safeUnlocked is True then
+        print "You Terry (Co-worker) as a suspect"
+        AddSuspect "Terry (Co-worker)"
+    end if
+    validResponse := False
+    loop while validResponse is False
+        PrintHud(4)
+        askQuestion("Do you: ", ["Visit the Victim's desk", "Enquire her boss", "Look around the workplace", "Return to the crime scene", "Arrest the coworker"])
+        read answer
+        if answer is Visit the Victim's desk then do
+            set validResponse to True
+            execute scene7
+        else if answer is Enquire her boss then do
+            set validResponse to True
+            execute scene9
+        else if answer is Look around the workplace then do
+            set validResponse to True
+            execute scene10
+        else if answer is Return to the crime scene then do
+            set validResponse to True
+            execute scene1
+        else if answer is Arrest the co-worker then do
+            askQuestion("Are you sure you want to arrest the co-worker?", ["Yes", "No"])
+            read answer
+            if answer is Yes
+                end(0)
+            end if
+        end if
+    end loop
+end procedure
+
+procedure scene9
+    print "You visit the victim's boss. As you are about to enter his office, you hear him talking on a call. You decide to eavesdrop.\n"
+    print "Boss: Yeah, I know there's a lot of corruption in our firm. Frankly, I was afraid she would catch me too.\n"
+    print "Boss: No no no, it was inevitable. She had poked in too close. If she wasn't murdered, I would have made sure to shush her. Thank god the co-worker...\n"
+    print "He looks in your direction.\n Boss: I'll talk to you later."
+    print "Boss (to you): Hey there, who are you?"
+    print "playerName: Hello there, I am detective playerName, the lead investigator in Ms Jackson's murder case. I have some questions for you."
+    print "Boss: Sure detective. Go ahead."
+    print "playerName: So sir, I have heard about some corruption business going on here. Could you tell me more about that."
+    print "\nBoss: Oh well, our firm was being investigated for corruption related offenses. It was mainly some associates that were involved."
+    print "playerName: So what was Ms Jackson's role in this."
+    print "Boss: Miss Jackson was the one who initiated the corruption investigation. She claimed that she had evidence against one of her co-workers, Terry."
+    print "playerName: So where was Terry yesterday at 4pm?"
+    print "Boss: He said he had to leave early for some business. He isn't married or has any kids, so he often hangs out at bars with his mates."
+    print "playerName: I see. Thank you a lot for your time."
+
+    print "You add Boss as a suspect as a suspect"
+    AddSuspect "Boss"
+    print "You add Terry (Co-worker) as a suspect"
+    AddSuspect "Terry (Co-worker)"
+    
+    validResponse := False
+    loop while validReponse is False
+        PrintHud(4)
+        askQuestion("Do you: ", ["Visit the Victim's desk", "Enquire her co-worker", "Look around the workplace", "Return to the crime scene", "Arrest the boss"])
+        read answer
+        if answer is Visit the Victim's desk then do
+            set validReponse to True
+            execute scene7
+        else if answer is Enquire her co-worker then do
+            set validReponse to True
+            execute scene8
+        else if answer is Look around the workplace then do
+            set validReponse to True
+            execute scene10
+        else if answer is Return to the crime scene then do
+            set validReponse to True
+            execute scene1
+        else if answer is Arrest the Boss then do
+            askQuestion("Are you sure you want to arrest the boss?", ["Yes", "No"])
+            read answer
+            if answer is Yes then do
+                end(1)
+            end if
+        end if
+    end loop
+end procedure
+
+procedure scene10
+    print "You have a look around the workplace and stumble upon an open storage room. It was filed with files of all sorts."
+    print "You locate a hidden section beneath an old pile, which interests you. It read 43.6F.72.72.75.70.74 20.43.61.73.65.73"
+    print "You decode the hexadecimal to ASCII. It reads: \"CORRUPT Cases\""
+    print "It contains a pile of case documents with several notes and highlights. They were all seemed to be about corruption caused by a lawyer called Terry\n"
+    print "You take notes\n"
+    AddNote "Victim had"
+    AddNote "Evidence against Terry"
+
+    PrintHud(7)
+    askQuestion("Do you: ", ["Visit the Victim's desk", "Enquire her coworker", "Enquire her boss", "Return to the crime scene"])
+    read answer
+    if answer is Visit the Victim's desk then do
+        execute scene7
+    else if answer is Enquire her coworker then do
+        execute scene8
+    else if answer is Enquire her boss then do
+        execute scene 9
+    else if answer is Return to the crime scene then do
+        execute scene 1
+end procedure
+
+procedure game
+    execute scene 1
+end procedure
+
+procedure main
+    print "Hello Detective, welcome to New York Police Department's 21st Precinct. Please Enter your name and press Enter/return to proceed: "
+    read answer
+    set playerName to answer
+    print "Hello playerName, we have heard great stories about you, and we require your help to solve a recent case. Let's head to the crime scene..."
+
+    set score to 75
+    set birthdate to a random birthdate between 1980 and 2000
+    set knowsAboutWork to False
+    set safeUnlocked to False
+    set beenToScene8 to False
+    set hud to a new HUD object
+    AddNote "Victim born on birthdate"
+
+    execute game
+end procedure
+
+execute main
